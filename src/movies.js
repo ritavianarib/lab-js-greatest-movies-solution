@@ -122,6 +122,28 @@ function orderAlphabetically(moviesArr) {
 
 // BONUS - Iteration 7: Time Format - Turn duration of the movies from hours to minutes
 
+function convertTime(timeString) {
+  // timeString pode ser
+  // 2h
+  // 43min
+
+  const duration = { hours: 0, minutes: 0 };
+
+  if (timeString.includes("h")) {
+    timeString.replace(/[a-z]/g, "");
+
+    duration.hours = timeString;
+
+    return duration;
+  }
+
+  timeString.replace(/[a-z]/g, "");
+
+  duration.minutes = timeString;
+
+  return duration;
+}
+
 function turnHoursToMinutes(moviesArr) {
   return moviesArr
     .map(function (movie) {
@@ -134,14 +156,13 @@ function turnHoursToMinutes(moviesArr) {
       let minutes = 0;
 
       if (durationArr.length === 2) {
-        hours = durationArr[0] || "0";
-        minutes = durationArr[1];
-
-        hours.replace(/[a-z]/g, "");
-        minutes.replace(/[a-z]/g, "");
+        hours = convertTime(durationArr[0]).hours;
+        minutes = convertTime(durationArr[1]).minutes;
       } else {
-        minutes = durationArr[0];
-        minutes.replace(/[a-z]/g, "");
+        // durationArr = ['2h']
+        hours = convertTime(durationArr[0]).hours;
+        // durationArr = ['43min']
+        minutes = convertTime(durationArr[0]).minutes;
       }
 
       movie.duration = parseInt(hours) * 60 + parseInt(minutes);
@@ -150,4 +171,63 @@ function turnHoursToMinutes(moviesArr) {
     });
 }
 
+// const turnHoursToMinutes = arr => {
+//   const timeMovies = JSON.parse(JSON.stringify(arr));
+
+//   timeMovies.forEach(movie => {
+//       if (!movie.duration.includes('h')) {
+//           movie.duration = parseInt(movie.duration);
+//       } else if (!movie.duration.includes('min')) {
+//           movie.duration = parseInt(movie.duration) * 60;
+//       } else {
+//           movie.duration = parseInt(movie.duration) * 60 + parseInt(movie.duration.slice(2));
+//       }
+//   });
+//   return timeMovies;
+// }
+
 // BONUS - Iteration 8: Best yearly rate average - Best yearly rate average
+
+function bestYearAvg(movieArr) {
+  if (!movieArr.length) {
+    return null;
+  }
+
+  const yearlyRates = {};
+  const yearlyAverages = {};
+
+  movieArr.map(function (movie) {
+    if (!yearlyRates.hasOwnProperty(movie.year)) {
+      yearlyRates[movie.year] = [];
+      yearlyRates[movie.year].push(movie.rate);
+    } else {
+      yearlyRates[movie.year].push(movie.rate);
+    }
+  });
+
+  const allYears = Object.keys(yearlyRates);
+
+  allYears.map(function (year) {
+    avg = yearlyRates[year].reduce(function (acc, rate, index, sourceArray) {
+      if (index === sourceArray.length - 1) {
+        acc += rate;
+
+        return acc / sourceArray.length;
+      }
+
+      return acc + rate;
+    });
+
+    yearlyAverages[year] = parseFloat(avg.toFixed(2));
+  });
+
+  const orderedAverages = Object.entries(yearlyAverages).sort(function (a, b) {
+    return b[1] - a[1];
+  });
+
+  console.log(orderedAverages);
+
+  return `The best year was ${orderedAverages[0][0]} with an average rate of ${orderedAverages[0][1]}`;
+}
+
+console.log(bestYearAvg(movies));
